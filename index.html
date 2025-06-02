@@ -18,14 +18,13 @@
         body {
             margin: 0;
             display: flex;
-            flex-direction: column;
-            justify-content: center; /* Center vertically */
-            align-items: center; /* Center horizontally */
+            flex-direction: column; /* Stack card and footer vertically */
+            justify-content: center; /* Center content vertically */
+            align-items: center; /* Center content horizontally */
             min-height: 100vh;
-            /* Changed Body Background to Blue/Purple Gradient */
             background: linear-gradient(to bottom right, #e3f2fd, #bbdefb, #d1c4e9, #b39ddb); /* Light Blue -> Medium Blue -> Light Purple -> Medium Purple */
             perspective: 1000px; /* For 3D effect */
-            overflow: hidden; /* Prevent overflow */
+            overflow: hidden; /* Prevent overflow caused by particles potentially */
             font-family: 'Poppins', sans-serif;
             position: relative; /* Needed for particle canvas and footer positioning */
             padding-bottom: 30px; /* Add padding at the bottom to make space for the footer */
@@ -40,7 +39,8 @@
             width: 100%;
             height: 100%;
             z-index: -2; /* Behind everything */
-            pointer-events: none; /* Allow clicks to pass through to card */
+            /* Important: Ensure pointer-events are auto so clicks/touches are detected on the canvas */
+             pointer-events: auto;
         }
 
 
@@ -50,37 +50,15 @@
             position: relative;
             cursor: pointer; /* Indicates clickable for flip */
             transition: transform 0.8s; /* Smooth transition on hover/interaction */
-            /* Animated Border */
             border-radius: 15px; /* Match card face border-radius */
-            overflow: hidden; /* Hide the moving gradient overflow */
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Keep container shadow */
-            z-index: 0; /* Ensure card is above base background and particles */
-            flex-shrink: 0; /* Prevent card from shrinking */
-            margin-top: auto;
-            margin-bottom: auto; /* Helps center vertically with flex column */
+            overflow: hidden; /* Keep for rounded corners */
+            /* Removed the old dark box-shadow from the container */
+             flex-shrink: 0; /* Prevent card from shrinking */
+             margin-top: auto; /* Push the card towards the center/bottom above footer */
+             margin-bottom: auto; /* Push the card towards the center/top above footer */
         }
 
-        /* Animated Border Pseudo-element */
-        .card-container::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            z-index: -1;
-            /* Changed Animated Border Gradient to Blue/Purple Shades */
-            background: linear-gradient(45deg, #42a5f5, #7b1fa2, #bbdefb, #5c6bc0); /* Blue, Purple, Light Blue, Indigo */
-            background-size: 400% 400%;
-            animation: moveGradient 10s linear infinite;
-            border-radius: 18px;
-            pointer-events: none;
-        }
-
-        @keyframes moveGradient {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 100% 100%; }
-        }
+        /* Animated Border Pseudo-element removed */
 
 
         /* Optional hover effect on container */
@@ -114,20 +92,28 @@
             padding: 20px;
             box-sizing: border-box;
             overflow: hidden;
+            pointer-events: auto;
+
+            /* --- Glassmorphism Effect --- */
+            /* Semi-transparent background will be set on front/back faces */
+            backdrop-filter: blur(10px); /* Apply the blur effect behind the element */
+            -webkit-backdrop-filter: blur(10px); /* Safari support */
+            border: 1px solid rgba(255, 255, 255, 0.18); /* Subtle white border */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Glass-style shadow */
         }
 
         .card-front {
-            /* Changed Front Background to Blue/Light Blue */
-            background: linear-gradient(to top left, #bbdefb, #e3f2fd); /* Light Blue -> Very Light Blue */
-            color: #4a148c; /* Deep purple text - kept this as it fits */
+            /* Adjusted background for Glassmorphism - use rgba colors */
+            background: linear-gradient(to top left, rgba(187, 222, 251, 0.6), rgba(227, 242, 253, 0.6)); /* Light Blue -> Very Light Blue with 60% opacity */
+            color: #4a148c; /* Deep purple text */
             z-index: 2;
             transform: rotateY(0deg);
         }
 
         .card-back {
-            /* Changed Inside Background to Very Light Purple/Blue */
-            background: linear-gradient(to bottom right, #ede7f6, #e3f2fd); /* Very Light Purple -> Very Light Blue */
-            color: #5d4037; /* Brownish text - kept this as it contrasts */
+            /* Adjusted background for Glassmorphism - use rgba colors */
+            background: linear-gradient(to bottom right, rgba(237, 231, 246, 0.6), rgba(227, 242, 253, 0.6)); /* Very Light Purple -> Very Light Blue with 60% opacity */
+            color: #5d4037; /* Brownish text */
             transform: rotateY(180deg);
             text-align: center;
             justify-content: flex-start;
@@ -143,7 +129,7 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
             position: relative;
             display: inline-block;
-            color: #7b1fa2; /* Purple heading color - kept this */
+            color: #7b1fa2; /* Purple heading color */
         }
 
         /* Shimmer Effect (on text) */
@@ -211,11 +197,12 @@
             box-shadow: inset -5px -5px 5px rgba(0,0,0,0.1);
         }
 
-        /* Updated Balloon Colors to match Blue/Purple Theme */
+        /* Balloon Colors (matching blue/purple theme) */
         .balloon[data-color="red"] { background-color: #ab47bc; } /* Purple */
         .balloon[data-color="blue"] { background-color: #42a5f5; } /* Keep Blue */
         .balloon[data-color="green"] { background-color: #bbdefb; } /* Light Blue */
         .balloon[data-color="yellow"] { background-color: #5c6bc0; } /* Indigo/Blue-Purple */
+
 
         .balloon::after {
             content: '';
@@ -285,35 +272,34 @@
             cursor: pointer;
         }
 
-        /* Optional: Disable pointer events on the faces during flip animation */
+        /* Ensure card faces have auto pointer events to handle clicks */
         .card-face {
              pointer-events: auto;
         }
 
         /* --- Footer Styles --- */
         footer {
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            font-size: 0.8em;
-            color: rgba(0, 0, 0, 0.4);
-            font-weight: 400;
-            z-index: 10;
+            position: absolute; /* Position footer at the bottom relative to body */
+            bottom: 10px; /* Distance from the bottom edge */
+            width: 100%; /* Span full width */
+            text-align: center; /* Center the text */
+            font-size: 0.8em; /* Smaller text size */
+            color: rgba(0, 0, 0, 0.4); /* Subtle text color */
+            font-weight: 400; /* Regular weight */
+            z-index: 10; /* Ensure it's above the background/card */
         }
 
         footer a {
-             color: rgba(0, 0, 0, 0.6);
-             text-decoration: none;
-             font-weight: 600;
-             transition: color 0.3s ease;
+             color: rgba(0, 0, 0, 0.6); /* Slightly darker color for the link */
+             text-decoration: none; /* Remove underline */
+             font-weight: 600; /* Make link text slightly bolder */
+             transition: color 0.3s ease; /* Smooth color transition on hover */
         }
 
         footer a:hover {
-             color: rgba(0, 0, 0, 0.8);
-             text-decoration: underline;
+             color: rgba(0, 0, 0, 0.8); /* Darken color on hover */
+             text-decoration: underline; /* Add underline on hover */
         }
-
 
     </style>
 </head>
@@ -327,14 +313,13 @@
             <div class="card-face card-front" id="cardFront">
                 <h1 class="shimmer">Happy Birthday</h1>
                 <h2 class="shimmer">T Santhiya!</h2> <!-- Updated Name -->
-                <!-- Updated Cake Image URL (kept same image) -->
+                <!-- Updated Cake Image URL -->
                 <img src="https://assets.onecompiler.app/3zky9aw9p/43kjab4wq/%E2%80%94Pngtree%E2%80%94birthday%20cake%203d_16787458.png" alt="Birthday Cake" class="cake" id="cake">
                 <div class="balloons-container">
-                    <!-- Data-color attributes are used in JS/CSS for color assignment -->
-                    <div class="balloon" data-color="red"></div> <!-- Now visually purple via CSS -->
-                    <div class="balloon" data-color="blue"></div> <!-- Still visually blue -->
-                    <div class="balloon" data-color="green"></div> <!-- Now visually light blue via CSS -->
-                    <div class="balloon" data-color="yellow"></div> <!-- Now visually indigo/blue-purple via CSS -->
+                    <div class="balloon" data-color="red"></div>
+                    <div class="balloon" data-color="blue"></div>
+                    <div class="balloon" data-color="green"></div>
+                    <div class="balloon" data-color="yellow"></div>
                 </div>
                 <p class="instruction">Click anywhere to open!</p>
             </div>
@@ -381,78 +366,133 @@
             let isFlipped = false;
             let isAnimating = false;
 
-            // --- Particle Animation ---
+            // --- Particle Animation (Emojis) ---
             let particles = [];
-            const particleCount = 50;
+            const initialParticleCount = 30; // Number of particles initially
+            const burstParticleCount = 15; // Number of particles on click/touch start
+            const trailParticleCount = 5; // Number of particles on touch move
+
+            // Emojis for the particles
+             const emojis = ['😀', '😁', '🎁', '🤠', '✨', '🥳', '🎈', '🎂', '💙', '💜', '✨', '🌟', '🎉', '🎊'];
+
 
             // Resize canvas when window is resized
             function resizeCanvas() {
                 particleCanvas.width = window.innerWidth;
                 particleCanvas.height = window.innerHeight;
+                 // Re-initialize particles on resize
+                 initParticles();
             }
 
-            // Particle class
-            function Particle(x, y, size, speedY, color) {
+            // Particle class (now for emojis)
+            function Particle(x, y, size, speedX, speedY, emoji) {
                 this.x = x;
                 this.y = y;
-                this.size = size;
-                this.speedY = speedY;
-                this.color = color;
-                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.size = size; // This will be the font size
+                this.speedX = speedX; // Allow horizontal movement
+                this.speedY = speedY; // Allow vertical movement (up or down)
+                this.emoji = emoji;
 
                 this.update = function() {
-                    this.y += this.speedY;
                     this.x += this.speedX;
-                    if (this.y < -this.size) {
-                         this.y = particleCanvas.height + this.size;
-                         this.x = Math.random() * particleCanvas.width;
-                         this.size = Math.random() * 3 + 1;
-                         this.speedY = Math.random() * -0.5 - 0.2;
-                         this.speedX = (Math.random() - 0.5) * 0.5;
-                     }
+                    this.y += this.speedY;
+
+                    // Wrap particles around if they go off-screen
+                    if (this.x < -this.size) this.x = particleCanvas.width + this.size;
+                    if (this.x > particleCanvas.width + this.size) this.x = -this.size;
+                    if (this.y < -this.size) this.y = particleCanvas.height + this.size;
+                    if (this.y > particleCanvas.height + this.size) this.y = -this.size;
                 }
 
                 this.draw = function() {
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.font = this.size + 'px sans-serif';
+                    ctx.fillText(this.emoji, this.x, this.y);
                 }
             }
 
-            // Initialize particles - Updated colors to match new theme
+            // Initialize a set number of particles randomly
             function initParticles() {
-                 particles = [];
-                 const colors = ['#42a5f5', '#7b1fa2', '#bbdefb', '#d1c4e9', '#5c6bc0']; // Blue, Purple, Light Blue, Light Purple, Indigo
-                for (let i = 0; i < particleCount; i++) {
-                    const size = Math.random() * 3 + 1;
+                 particles = []; // Clear existing particles
+                 for (let i = 0; i < initialParticleCount; i++) {
+                    const size = Math.random() * 12 + 8; // Size between 8 and 20px
                     const x = Math.random() * particleCanvas.width;
                     const y = Math.random() * particleCanvas.height;
-                    const speedY = Math.random() * -0.5 - 0.2;
-                    const color = colors[Math.floor(Math.random() * colors.length)];
-                    particles.push(new Particle(x, y, size, speedY, color));
+                    // Random speed in any direction
+                    const speedX = (Math.random() - 0.5) * 1.5; // Speed between -0.75 and 0.75
+                    const speedY = (Math.random() - 0.5) * 1.5; // Speed between -0.75 and 0.75
+                    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    particles.push(new Particle(x, y, size, speedX, speedY, emoji));
                 }
             }
 
-            // Animation loop for particles
+            // Create a burst of particles at a specific location
+            function createParticlesAtLocation(x, y, count) {
+                 for (let i = 0; i < count; i++) {
+                     const size = Math.random() * 15 + 10; // Slightly larger size for burst effect
+                     // Slightly vary the starting position around the click/touch point
+                     const startX = x + (Math.random() - 0.5) * 20;
+                     const startY = y + (Math.random() - 0.5) * 20;
+                    // Random speed in any direction, potentially slightly faster for burst
+                    const speedX = (Math.random() - 0.5) * 3; // Speed between -1.5 and 1.5
+                    const speedY = (Math.random() - 0.5) * 3; // Speed between -1.5 and 1.5
+                    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    particles.push(new Particle(startX, startY, size, speedX, speedY, emoji));
+                 }
+            }
+
+
+            // Animation loop for particles (emojis)
             function animateParticles() {
-                ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+                ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height); // Clear canvas
                 for (let i = 0; i < particles.length; i++) {
-                    particles[i].update();
-                    particles[i].draw();
+                    particles[i].update(); // Update position
+                    particles[i].draw(); // Draw particle (emoji)
                 }
-                requestAnimationFrame(animateParticles);
+                requestAnimationFrame(animateParticles); // Loop the animation
             }
 
             // Event listener for window resize
             window.addEventListener('resize', resizeCanvas);
 
+            // --- Particle Generation on Click/Touch ---
+            // Add listeners to the particle canvas itself as it covers the background
+            particleCanvas.addEventListener('click', (event) => {
+                 // Create a burst of particles at the click location
+                createParticlesAtLocation(event.clientX, event.clientY, burstParticleCount);
+            });
+
+             particleCanvas.addEventListener('touchstart', (event) => {
+                 // Prevent default touch behavior like scrolling/zooming
+                 event.preventDefault(); // NOTE: Be careful with preventDefault, it might block other things if not managed carefully. Since this canvas is z-index -2, it shouldn't affect card clicks.
+
+                 // Create a burst for each touch point
+                 for(let i=0; i < event.touches.length; i++) {
+                     createParticlesAtLocation(event.touches[i].clientX, event.touches[i].clientY, burstParticleCount);
+                 }
+            }, { passive: false }); // Use passive: false to allow preventDefault
+
+             particleCanvas.addEventListener('touchmove', (event) => {
+                 // Prevent default touch behavior
+                 event.preventDefault(); // NOTE: Be careful with preventDefault
+
+                 // Create fewer particles for trailing effect on touch move
+                  for(let i=0; i < event.touches.length; i++) {
+                     createParticlesAtLocation(event.touches[i].clientX, event.touches[i].clientY, trailParticleCount);
+                 }
+            }, { passive: false }); // Use passive: false to allow preventDefault
+
+
             // --- Card Flip Toggle ---
-             cardContainer.addEventListener('click', () => {
-                if (!isAnimating) {
+             cardContainer.addEventListener('click', (event) => {
+                 // This listener will fire if the click is *on* the card container itself or its children,
+                 // because the card's z-index is higher than the canvas's z-index -2.
+                 // Clicks on the background (canvas) will be handled by the canvas listeners.
+
+                 if (!isAnimating) {
                     isAnimating = true;
                     cardFront.style.pointerEvents = 'none';
                     cardBack.style.pointerEvents = 'none';
+
 
                     if (isFlipped) {
                         cardWrapper.classList.remove('flipped');
@@ -462,6 +502,8 @@
                          playAudio(flipSound);
                     }
                 }
+                // Allow propagation for child elements like cake/balloons/giftbox if they are clicked
+                // event.stopPropagation(); // REMOVED - let child click handlers stop it if needed
             });
 
             // Listener for when the flip animation ends
@@ -482,16 +524,17 @@
             });
 
 
-            // --- Cake Confetti ---
+            // --- Cake Confetti (Uses external library) ---
             cake.addEventListener('click', (event) => {
                  if (!isFlipped && !isAnimating) {
-                     triggerConfetti(event);
+                     triggerConfetti(event); // External library confetti
                      playAudio(confettiSound);
                  }
+                 // Stop propagation so clicking the cake doesn't also flip the card
                  event.stopPropagation();
             });
 
-            // Function to trigger canvas-confetti - Updated colors to match new theme
+            // Function to trigger canvas-confetti (standard shapes)
             function triggerConfetti(event) {
                  const x = event.clientX / window.innerWidth;
                  const y = event.clientY / window.innerHeight;
@@ -503,16 +546,16 @@
                     gravity: 0.8,
                     scalar: 0.9,
                     zIndex: 9999,
-                    // Updated Confetti colors
+                    // Confetti colors (matching blue/purple theme)
                     colors: ['#ab47bc', '#42a5f5', '#bbdefb', '#5c6bc0', '#7b1fa2', '#d1c4e9']
                 });
             }
 
-            // --- Balloon Pop Confetti ---
+            // --- Balloon Pop Confetti (Uses external library) ---
             balloons.forEach(balloon => {
                 balloon.addEventListener('click', (event) => {
                      if (!isFlipped && !isAnimating && !balloon.classList.contains('popped')) {
-                        triggerBalloonConfetti(balloon);
+                        triggerBalloonConfetti(balloon); // External library confetti
                         playAudio(popSound);
 
                         balloon.classList.add('popped');
@@ -520,12 +563,13 @@
                              balloon.style.visibility = 'hidden';
                          }, 300);
 
+                        // Stop propagation so clicking a balloon doesn't also flip the card
                         event.stopPropagation();
                      }
                 });
             });
 
-            // Function to trigger localized confetti for balloon pop - Updated colors to match new theme
+            // Function to trigger localized confetti for balloon pop (standard shapes)
             function triggerBalloonConfetti(balloon) {
                 const rect = balloon.getBoundingClientRect();
                 const x = (rect.left + rect.width / 2) / window.innerWidth;
@@ -538,7 +582,6 @@
                     gravity: 0.7,
                     scalar: 0.7,
                     zIndex: 9999,
-                    // Updated Balloon Confetti colors
                     colors: ['#ab47bc', '#42a5f5', '#bbdefb', '#5c6bc0']
                 });
             }
@@ -551,6 +594,7 @@
                     const redeemUrl = 'https://play.google.com/redeem?code=AL7JHW2MWYPG7VE0';
                     window.open(redeemUrl, '_blank');
                 }
+                // Stop propagation so clicking the gift doesn't also flip the card back
                 event.stopPropagation();
             });
 
@@ -568,9 +612,11 @@
             }
 
             // --- Initialization ---
-            resizeCanvas();
-            initParticles();
-            animateParticles();
+            resizeCanvas(); // Set initial canvas size and initialize particles
+            animateParticles(); // Start the particle animation loop
+
+            // Note: Due to browser autoplay policies, sound might not work until the user
+            // interacts with the page (like clicking to flip the card).
 
         });
     </script>
