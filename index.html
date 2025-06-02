@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday T Santhiya!</title> <!-- Title பெயர் மாற்றம் -->
+
+    <!-- Google Font: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,100;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- Embedded CSS -->
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom right, #ffebee, #ffcdd2, #f8bbd0); /* Beautiful gentle gradient */
+            perspective: 1000px; /* For 3D effect */
+            overflow: hidden; /* Prevent overflow */
+            font-family: 'Poppins', sans-serif;
+            position: relative; /* Needed for particle canvas positioning */
+        }
+
+        /* Particle Canvas for Body Background */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2; /* Behind everything */
+            pointer-events: none; /* Allow clicks to pass through to card */
+        }
+
+
+        .card-container {
+            width: 300px; /* Adjust card size as needed */
+            height: 450px; /* Adjust card size as needed */
+            position: relative;
+            cursor: pointer; /* Indicates clickable for flip */
+            transition: transform 0.8s; /* Smooth transition on hover/interaction */
+            /* Animated Border */
+            border-radius: 15px; /* Match card face border-radius */
+            overflow: hidden; /* Hide the moving gradient overflow */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Keep container shadow */
+            z-index: 0; /* Ensure card is above base background and particles */
+        }
+
+        /* Animated Border Pseudo-element */
+        .card-container::before {
+            content: '';
+            position: absolute;
+            top: -10px; /* Extend beyond container */
+            left: -10px; /* Extend beyond container */
+            right: -10px; /* Extend beyond container */
+            bottom: -10px; /* Extend beyond container */
+            z-index: -1; /* Behind the card wrapper but above base background */
+            background: linear-gradient(45deg, #42a5f5, #7b1fa2, #42a5f5, #ef5350); /* Blue, Purple, and Pink Gradient */
+            background-size: 400% 400%; /* Make gradient large for movement */
+            animation: moveGradient 10s linear infinite; /* Animation */
+            border-radius: 18px; /* Slightly larger than container for border effect */
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+
+        @keyframes moveGradient {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; } /* Diagonal movement */
+        }
+
+
+        /* Optional hover effect on container */
+        .card-container:hover {
+            transform: scale(1.03);
+        }
+
+        .card-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Flip transition */
+             z-index: 1; /* Above the animated border */
+        }
+
+        .card-wrapper.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden; /* Hide the back side when facing away */
+            border-radius: 15px; /* Match container border-radius */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden; /* Ensure elements don't spill out */
+            /* Optional: Disable pointer events during flip animation */
+             /* pointer-events: auto;  Default */
+        }
+
+        .card-front {
+            background: linear-gradient(to top left, #f8bbd0, #ef9a9a); /* Front background */
+            color: #4a148c; /* Deep purple text */
+            z-index: 2; /* Front is on top initially */
+            transform: rotateY(0deg);
+        }
+
+        .card-back {
+            background: linear-gradient(to bottom right, #fff9c4, #fff59d); /* Inside background */
+            color: #5d4037; /* Brownish text */
+            transform: rotateY(180deg); /* Initially flipped */
+            text-align: center;
+            justify-content: flex-start; /* Align content from top */
+            padding-top: 40px;
+            gap: 20px; /* Space between inside elements */
+            z-index: 1;
+        }
+
+        h1, h2 {
+            margin: 5px 0;
+            font-weight: 100; /* Poppins 100 */
+            font-style: italic; /* Poppins Italic */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            position: relative; /* Needed for shimmer pseudo-element */
+            display: inline-block; /* Needed for text shimmer effect */
+            color: #7b1fa2; /* Slightly different shade for headings */
+        }
+
+        /* Shimmer Effect (on text) */
+        .shimmer {
+            position: relative;
+            display: inline-block;
+            overflow: hidden; /* Hide the overflow of the pseudo-element */
+        }
+
+        .shimmer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%; /* Start position outside */
+            width: 100%; /* Shimmer width */
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%, /* Shimmer color */
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: skewX(-20deg); /* Angle the shimmer */
+            animation: shimmer 3s infinite; /* Shimmer animation */
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -150%;
+            }
+            50% {
+                left: 150%; /* Move across the text */
+            }
+            100% {
+                left: -150%; /* Reset or continue, 'infinite' handles continuation */
+            }
+        }
+
+        .cake {
+            width: 60%; /* Adjust size relative to card */
+            height: auto;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .cake:hover {
+            transform: scale(1.05) rotate(-3deg); /* Hover effect */
+        }
+
+        .balloons-container {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 30px; /* Prevent balloons from touching edges */
+            box-sizing: border-box;
+        }
+
+        .balloon {
+            width: 30px;
+            height: 40px;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            opacity: 1;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            box-shadow: inset -5px -5px 5px rgba(0,0,0,0.1); /* Inner shadow for balloon shape */
+        }
+
+        /* Balloon Colors */
+        .balloon[data-color="red"] { background-color: #ef5350; }
+        .balloon[data-color="blue"] { background-color: #42a5f5; }
+        .balloon[data-color="green"] { background-color: #66bb6a; }
+        .balloon[data-color="yellow"] { background-color: #ffee58; }
+
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -15px; /* Position of the string start */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .balloon:hover {
+            transform: translateY(-5px) scale(1.1); /* Hover effect */
+        }
+
+        /* Pop animation class */
+        .balloon.popped {
+            animation: pop 0.3s ease-out forwards;
+            opacity: 0; /* Start fading out */
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.5;}
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .instruction {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9em;
+            color: rgba(0, 0, 0, 0.5);
+            font-weight: 400; /* Slightly bolder for readability */
+        }
+
+        .card-back .instruction {
+            bottom: 15px; /* Adjust if needed */
+        }
+
+        .inside-message {
+            margin: 0;
+            font-size: 1em;
+            line-height: 1.6;
+            font-weight: 400; /* Poppins 400 for better readability */
+            font-style: italic;
+            color: #5d4037; /* Brownish text */
+            width: 100%; /* Make sure it fits */
+            padding: 0 10px; /* Inner padding */
+        }
+
+        .gift-box {
+            font-size: 4em; /* Size of the emoji */
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            line-height: 1; /* Prevent extra space around emoji */
+        }
+
+        .gift-box:hover {
+            transform: scale(1.1) rotate(5deg); /* Hover effect */
+        }
+
+        /* Surprise message styles are no longer needed as it's removed */
+
+        /* Make sure clickable items have pointer cursor */
+        .cake, .balloon, .gift-box {
+            cursor: pointer;
+        }
+
+        /* Optional: Disable pointer events on the faces during flip animation */
+        .card-face {
+             pointer-events: auto; /* Default */
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Particle Canvas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="card-container" id="cardContainer">
+        <div class="card-wrapper" id="cardWrapper">
+            <div class="card-face card-front" id="cardFront">
+                <h1 class="shimmer">Happy Birthday</h1>
+                <h2 class="shimmer">T Santhiya!</h2> <!-- Updated Name -->
+                <!-- Updated Cake Image URL -->
+                <img src="https://assets.onecompiler.app/3zky9aw9p/43kjab4wq/%E2%80%94Pngtree%E2%80%94birthday%20cake%203d_16787458.png" alt="Birthday Cake" class="cake" id="cake">
+                <div class="balloons-container">
+                    <div class="balloon" data-color="red"></div>
+                    <div class="balloon" data-color="blue"></div>
+                    <div class="balloon" data-color="green"></div>
+                    <div class="balloon" data-color="yellow"></div>
+                </div>
+                <p class="instruction">Click anywhere to open!</p>
+            </div>
+            <div class="card-face card-back" id="cardBack">
+                <p class="inside-message">
+                     T Santhiya,<br><br> <!-- Updated Name -->
+                    Entha pulliku Nalla Buthiya Kudu Kadavale  Mm Happy Birthday <br><br>
+                    With Developer,<br>
+                    [EVS]
+                </p>
+                <div class="gift-box" id="giftBox">
+                    🎁
+                </div>
+                <!-- Surprise message div removed/commented out as gift box now opens a link -->
+                <p class="instruction">Click the gift!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sound Effects (Remember to replace src with actual paths!) -->
+    <audio id="flipSound" src="path/to/flip.mp3" preload="auto"></audio>
+    <audio id="confettiSound" src="path/to/confetti.mp3" preload="auto"></audio>
+    <audio id="popSound" src="path/to/pop.mp3" preload="auto"></audio> <!-- Check this path -->
+    <audio id="surpriseSound" src="path/to/surprise.mp3" preload="auto"></audio>
+
+    <!-- Embedded JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cardContainer = document.getElementById('cardContainer'); // Get the container for main click
+            const cardWrapper = document.getElementById('cardWrapper');
+            const cardFront = document.getElementById('cardFront');
+            const cardBack = document.getElementById('cardBack');
+            const cake = document.getElementById('cake');
+            const balloons = document.querySelectorAll('.balloon');
+            const giftBox = document.getElementById('giftBox');
+            const particleCanvas = document.getElementById('particleCanvas'); // Get the canvas
+            const ctx = particleCanvas.getContext('2d'); // Get 2D context
+
+            // Sound elements
+            const flipSound = document.getElementById('flipSound');
+            const confettiSound = document.getElementById('confettiSound');
+            const popSound = document.getElementById('popSound'); // Reference to pop sound
+            const surpriseSound = document.getElementById('surpriseSound'); // Kept for gift box click sound
+
+            let isFlipped = false;
+            let isAnimating = false; // Flag to prevent multiple flips/interactions during animation
+
+            // --- Particle Animation ---
+            let particles = [];
+            const particleCount = 50; // Number of particles
+
+            // Resize canvas when window is resized
+            function resizeCanvas() {
+                particleCanvas.width = window.innerWidth;
+                particleCanvas.height = window.innerHeight;
+                // Re-initialize particles if needed, or handle repositioning
+                // For simplicity, we'll just let them continue or be replaced over time
+            }
+
+            // Particle class (simple object structure)
+            function Particle(x, y, size, speedY, color) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.speedY = speedY; // Speed will be negative to move up
+                this.color = color;
+                // Optional: slight horizontal drift
+                this.speedX = (Math.random() - 0.5) * 0.5; // Random small horizontal speed
+
+                this.update = function() {
+                    this.y += this.speedY;
+                    this.x += this.speedX;
+                     // If particle goes off screen (top), reset it to the bottom
+                    if (this.y < -this.size) {
+                         this.y = particleCanvas.height + this.size;
+                         this.x = Math.random() * particleCanvas.width; // Random horizontal start
+                         this.size = Math.random() * 3 + 1; // Reset size
+                         this.speedY = Math.random() * -0.5 - 0.2; // Reset speed (slow negative)
+                         this.speedX = (Math.random() - 0.5) * 0.5; // Reset horizontal speed
+                     }
+                }
+
+                this.draw = function() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    // Draw simple circles
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Initialize particles
+            function initParticles() {
+                 particles = []; // Clear existing particles
+                 const colors = ['#42a5f5', '#7b1fa2', '#ef5350', '#ffcdd2', '#fff59d']; // Blue, Purple, Pink, Light Pink, Light Yellow
+                for (let i = 0; i < particleCount; i++) {
+                    const size = Math.random() * 3 + 1; // Small particles
+                    const x = Math.random() * particleCanvas.width;
+                    const y = Math.random() * particleCanvas.height; // Start anywhere vertically initially
+                    const speedY = Math.random() * -0.5 - 0.2; // Slow upward speed
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    particles.push(new Particle(x, y, size, speedY, color));
+                }
+            }
+
+            // Animation loop for particles
+            function animateParticles() {
+                ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height); // Clear canvas
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update(); // Update position
+                    particles[i].draw(); // Draw particle
+                }
+                requestAnimationFrame(animateParticles); // Loop the animation
+            }
+
+            // Event listener for window resize
+            window.addEventListener('resize', resizeCanvas);
+
+            // --- Card Flip Toggle ---
+            // Click anywhere on the card container to flip
+             cardContainer.addEventListener('click', () => {
+                if (!isAnimating) {
+                    isAnimating = true;
+                    // Optional: Disable pointer events on faces during animation via JS
+                    cardFront.style.pointerEvents = 'none';
+                    cardBack.style.pointerEvents = 'none';
+
+
+                    if (isFlipped) {
+                         // If currently flipped (showing back), flip back to front
+                        cardWrapper.classList.remove('flipped');
+                        playAudio(flipSound); // Play flip sound
+                    } else {
+                        // If currently not flipped (showing front), flip to back
+                        cardWrapper.classList.add('flipped');
+                         playAudio(flipSound);
+                    }
+                }
+            });
+
+            // Listener for when the flip animation ends
+            cardWrapper.addEventListener('transitionend', (event) => {
+                 // Ensure it's the transform property transition that ended
+                 if (event.propertyName === 'transform') {
+                     isAnimating = false;
+                     // Re-enable pointer events on faces after flip
+                     cardFront.style.pointerEvents = 'auto';
+                     cardBack.style.pointerEvents = 'auto';
+
+                     // Update isFlipped state based on whether the 'flipped' class is present
+                     isFlipped = cardWrapper.classList.contains('flipped');
+
+                     // Reset balloons if flipping back to front so they can be popped again
+                     if (!isFlipped) { // Just finished flipping TO the front
+                         balloons.forEach(balloon => {
+                             balloon.classList.remove('popped');
+                             balloon.style.visibility = 'visible'; // Make them visible again
+                         });
+                     }
+                 }
+            });
+
+
+            // --- Cake Confetti ---
+            cake.addEventListener('click', (event) => {
+                 // Only trigger if the card is NOT flipped (cake is on the front) and not animating
+                 if (!isFlipped && !isAnimating) {
+                     triggerConfetti(event);
+                     playAudio(confettiSound);
+                 }
+                 // Prevent click from bubbling up to cardContainer listener and triggering flip
+                 event.stopPropagation();
+            });
+
+            // Function to trigger canvas-confetti
+            function triggerConfetti(event) {
+                 // Calculate origin based on the click position relative to the page
+                 const x = event.clientX / window.innerWidth;
+                 const y = event.clientY / window.innerHeight;
+
+                confetti({
+                    particleCount: 100, // Number of confetti pieces
+                    spread: 70,         // Spread angle
+                    origin: { x: x, y: y },
+                    gravity: 0.8,
+                    scalar: 0.9,        // Size of particles
+                    zIndex: 9999,
+                    colors: ['#ef5350', '#42a5f5', '#66bb6a', '#ffee58', '#ab47bc', '#ec407a'] // Match balloon/card colors
+                });
+            }
+
+            // --- Balloon Pop Confetti ---
+            balloons.forEach(balloon => {
+                balloon.addEventListener('click', (event) => {
+                    // Only allow balloon pop if the card is NOT flipped (balloons are on the front)
+                    // and not animating and balloon hasn't popped
+                     if (!isFlipped && !isAnimating && !balloon.classList.contains('popped')) {
+                        // Trigger a small confetti burst near the balloon
+                        triggerBalloonConfetti(balloon);
+                        playAudio(popSound); // Play pop sound - CHECK THIS AUDIO PATH!
+
+                        // Add pop animation class and hide the balloon after animation
+                        balloon.classList.add('popped');
+                         // Use setTimeout to allow pop animation briefly before hiding
+                         setTimeout(() => {
+                             balloon.style.visibility = 'hidden';
+                         }, 300); // Match the pop animation duration (0.3s in CSS)
+
+                        // Prevent click from bubbling up and flipping card
+                        event.stopPropagation();
+                     }
+                });
+            });
+
+            // Function to trigger localized confetti for balloon pop
+            function triggerBalloonConfetti(balloon) {
+                const rect = balloon.getBoundingClientRect();
+                const x = (rect.left + rect.width / 2) / window.innerWidth;
+                const y = (rect.top + rect.height / 2) / window.innerHeight;
+
+                confetti({
+                    particleCount: 30, // Fewer particles for a mini-burst
+                    spread: 50,
+                    origin: { x: x, y: y },
+                    gravity: 0.7,
+                    scalar: 0.7, // Smaller particles
+                    zIndex: 9999,
+                    colors: ['#ef5350', '#42a5f5', '#66bb6a', '#ffee58'] // Balloon colors
+                });
+            }
+
+            // --- Gift Box Redirect ---
+            giftBox.addEventListener('click', (event) => {
+                // Only trigger if card IS flipped (gift box is on the back) and not animating
+                if (isFlipped && !isAnimating) {
+                    playAudio(surpriseSound); // Play surprise sound for gift click
+
+                    // Google Play Store redeem URL with the provided code
+                    const redeemUrl = 'https://play.google.com/redeem?code=AL7JHW2MWYPG7VE0';
+
+                    // Open the URL in a new tab/window
+                    window.open(redeemUrl, '_blank');
+
+                }
+                 // Prevent click from bubbling up to cardContainer listener and triggering flip back
+                 event.stopPropagation();
+            });
+
+            // --- Audio Playback ---
+            function playAudio(audioElement) {
+                if (audioElement) {
+                    // Stop and reset if already playing
+                    audioElement.currentTime = 0;
+                    audioElement.play().catch(error => {
+                        // This catch block is important! Browsers often block autoplay.
+                        // The user's first click (to flip the card) helps enable audio,
+                        // but subsequent sounds might still be blocked depending on browser policy.
+                        console.warn(`Audio playback blocked or failed for ${audioElement.id}:`, error);
+                        console.warn("User interaction might be needed to enable sound.");
+                    });
+                } else {
+                    console.warn("Audio element not found or not provided.");
+                }
+            }
+
+            // --- Initialization ---
+            // Set initial canvas size and start particle animation
+            resizeCanvas();
+            initParticles();
+            animateParticles();
+
+            // Note: Due to browser autoplay policies, sound might not work until the user
+            // interacts with the page (like clicking to flip the card).
+
+        });
+    </script>
+
+</body>
+</html>
